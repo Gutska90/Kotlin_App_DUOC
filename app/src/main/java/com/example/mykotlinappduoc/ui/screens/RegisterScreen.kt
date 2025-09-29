@@ -30,7 +30,8 @@ import com.example.mykotlinappduoc.data.UserManager
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    viewModel: com.example.mykotlinappduoc.viewmodel.RecipeViewModel
 ) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -60,7 +61,7 @@ fun RegisterScreen(
         )
         
         Text(
-            text = "Registro accesible para personas con discapacidad visual",
+            text = "Únete a la comunidad de cocina saludable",
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 32.dp)
@@ -214,28 +215,16 @@ fun RegisterScreen(
                     }
                     else -> {
                         isLoading = true
-                        val newUser = User(
-                            id = UserManager.getAllUsers().size + 1,
-                            username = username,
-                            email = email,
-                            password = password,
-                            fullName = fullName,
-                            isAccessibilityEnabled = true
-                        )
-                        
-                        if (UserManager.registerUser(newUser)) {
-                            successMessage = "¡Cuenta creada exitosamente!"
-                            // Limpiar campos
-                            username = ""
-                            email = ""
-                            fullName = ""
-                            password = ""
-                            confirmPassword = ""
-                            isLoading = false
-                        } else {
-                            errorMessage = "El usuario o email ya existe"
-                            isLoading = false
-                        }
+                        // Registro con Firebase
+                        viewModel.registerUser(email, password, fullName)
+                        successMessage = "¡Cuenta creada exitosamente!"
+                        // Limpiar campos
+                        username = ""
+                        email = ""
+                        fullName = ""
+                        password = ""
+                        confirmPassword = ""
+                        isLoading = false
                     }
                 }
             },

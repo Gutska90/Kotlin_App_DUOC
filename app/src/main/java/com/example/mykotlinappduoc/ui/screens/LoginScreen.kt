@@ -27,9 +27,10 @@ import com.example.mykotlinappduoc.data.UserManager
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onLoginSuccess: (String) -> Unit,
+    onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    onNavigateToForgotPassword: () -> Unit
+    onNavigateToForgotPassword: () -> Unit,
+    viewModel: com.example.mykotlinappduoc.viewmodel.RecipeViewModel
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -46,7 +47,7 @@ fun LoginScreen(
     ) {
         // Título principal con accesibilidad mejorada
         Text(
-            text = "Acceso a la Aplicación",
+            text = "Minuta Nutricional",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -54,7 +55,7 @@ fun LoginScreen(
         )
         
         Text(
-            text = "Para personas con discapacidad visual",
+            text = "Planifica tus comidas saludables",
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 32.dp)
@@ -125,14 +126,9 @@ fun LoginScreen(
                     errorMessage = "Por favor complete todos los campos"
                 } else {
                     isLoading = true
-                    // Simular autenticación
-                    val user = UserManager.authenticateUser(username, password)
-                    if (user != null) {
-                        onLoginSuccess(user.fullName)
-                    } else {
-                        errorMessage = "Credenciales incorrectas"
-                        isLoading = false
-                    }
+                    // Autenticación con Firebase
+                    viewModel.signIn(username, password)
+                    onLoginSuccess()
                 }
             },
             modifier = Modifier

@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Reglas para usuarios
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+    
+    // Reglas para recetas
+    match /recipes/{recipeId} {
+      // Cualquier usuario autenticado puede leer recetas públicas
+      allow read: if request.auth != null && 
+        (resource.data.isPublic == true || 
+         resource.data.createdBy == request.auth.uid);
+      
+      // Solo el creador puede actualizar/eliminar sus recetas
+      allow update, delete: if request.auth != null && 
+        resource.data.createdBy == request.auth.uid;
+      
+      // Cualquier usuario autenticado puede crear recetas
+      allow create: if request.auth != null && 
+        request.resource.data.createdBy == request.auth.uid;
+    }
+    
+    // Reglas para minutas semanales
+    match /weekly_menus/{menuId} {
+      // Solo el propietario puede leer, escribir, actualizar y eliminar su minuta
+      allow read, write, update, delete: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+      
+      // Cualquier usuario autenticado puede crear una minuta
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Reglas para favoritos (si se implementa en el futuro)
+    match /favorites/{favoriteId} {
+      allow read, write, update, delete: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Reglas para comentarios (si se implementa en el futuro)
+    match /comments/{commentId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+    }
+  }
+}

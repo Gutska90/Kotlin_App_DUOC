@@ -1,38 +1,54 @@
-# Aplicación de Accesibilidad Visual
+# Minuta Nutricional - Aplicación Móvil
 
-Una aplicación móvil desarrollada en Kotlin con Android Studio, diseñada específicamente para personas con discapacidad sensorial visual.
+Una aplicación móvil desarrollada en Kotlin con Android Studio, diseñada para facilitar la planificación de comidas saludables para usuarios de baja habilidad informática.
 
 ## 🎯 Características Principales
 
-- **Autenticación completa**: Login, registro y recuperación de contraseña
-- **Funcionalidades de accesibilidad**: Lectura de texto y escritura asistida
-- **Interfaz accesible**: Diseñada con Material Design y Jetpack Compose
-- **Usuarios predefinidos**: 5 usuarios de prueba incluidos
-- **Navegación intuitiva**: Flujo de pantallas optimizado para accesibilidad
+- **Autenticación con Firebase**: Login, registro y recuperación de contraseña
+- **Gestión de recetas**: CRUD completo para recetas nutricionales
+- **Minuta semanal**: Planificación de comidas por semana
+- **Búsqueda de dispositivos**: Conecta con otros dispositivos para compartir recetas
+- **Interfaz intuitiva**: Diseñada para usuarios de baja habilidad informática
+- **Persistencia de datos**: Integración completa con Firebase Firestore
 
 ## 🚀 Funcionalidades Implementadas
 
 ### Pantallas de Autenticación
-- **Login**: Acceso con usuario/email y contraseña
+- **Login**: Acceso con email y contraseña usando Firebase Auth
 - **Registro**: Creación de nuevas cuentas con validaciones
 - **Recuperación de contraseña**: Proceso de recuperación por email
 
-### Funcionalidades de Accesibilidad
-- **Lectura de texto**: Convierte texto escrito en audio
-- **Escritura asistida**: Herramientas de escritura con corrección automática
-- **Configuración de accesibilidad**: Panel de ajustes personalizables
+### Gestión de Recetas
+- **Lista de recetas**: Visualización de recetas públicas
+- **Búsqueda**: Búsqueda por nombre, ingredientes o descripción
+- **Filtros**: Filtrado por categoría (Desayuno, Almuerzo, Cena, Snack)
+- **Detalles**: Información completa de cada receta
 
-## 👥 Usuarios de Prueba
+### Minuta Semanal
+- **Planificación**: Creación y edición de minutas semanales
+- **Vista por días**: Organización de comidas por día de la semana
+- **Gestión de comidas**: Asignación de recetas a cada comida del día
 
-La aplicación incluye 5 usuarios predefinidos para testing:
+### Búsqueda de Dispositivos
+- **Detección**: Búsqueda de dispositivos cercanos en la red
+- **Conexión**: Conecta con otros dispositivos para compartir recetas
+- **Sincronización**: Comparte minutas y recetas entre dispositivos
 
-| Usuario | Email | Contraseña | Nombre |
-|---------|-------|------------|--------|
-| usuario1 | usuario1@email.com | password123 | María González |
-| usuario2 | usuario2@email.com | password456 | Carlos Rodríguez |
-| usuario3 | usuario3@email.com | password789 | Ana Martínez |
-| usuario4 | usuario4@email.com | password012 | Luis Fernández |
-| usuario5 | usuario5@email.com | password345 | Carmen López |
+## 🔥 Firebase Integration
+
+La aplicación utiliza Firebase para:
+
+- **Autenticación**: Firebase Auth para login y registro
+- **Base de datos**: Firestore para persistencia de datos
+- **Almacenamiento**: Firebase Storage para imágenes de recetas
+- **Analytics**: Firebase Analytics para métricas de uso
+
+### Configuración de Firebase
+
+1. Crear proyecto en [Firebase Console](https://console.firebase.google.com)
+2. Agregar aplicación Android con package name: `com.example.mykotlinappduoc`
+3. Descargar `google-services.json` y reemplazar el archivo en `app/`
+4. Configurar reglas de seguridad en Firestore
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -40,6 +56,9 @@ La aplicación incluye 5 usuarios predefinidos para testing:
 - **Android Studio**: IDE de desarrollo
 - **Jetpack Compose**: Framework de UI moderna
 - **Material Design 3**: Sistema de diseño de Google
+- **Firebase**: Backend como servicio (Auth, Firestore, Storage)
+- **MVVM Architecture**: Patrón de arquitectura con ViewModel
+- **Coroutines**: Programación asíncrona
 - **Android API 24+**: Compatibilidad con dispositivos modernos
 
 ## 📱 Requisitos del Sistema
@@ -105,9 +124,12 @@ app/src/main/java/com/example/mykotlinappduoc/
 ✅ **Android Studio**: Proyecto desarrollado en Android Studio  
 ✅ **Jetpack Compose**: UI implementada con Jetpack Compose  
 ✅ **Material Design**: Componentes Material Design integrados  
-✅ **Pantallas requeridas**: Login, Registro y Recuperación implementadas  
-✅ **Array de usuarios**: 5 usuarios predefinidos en Kotlin  
-✅ **Funcionalidades de accesibilidad**: Lectura y escritura asistida  
+✅ **Firebase Integration**: Backend completo con Firebase  
+✅ **Autenticación**: Firebase Auth para usuarios  
+✅ **Base de datos**: Firestore para persistencia  
+✅ **CRUD completo**: Gestión de usuarios, recetas y minutas  
+✅ **Pantallas requeridas**: Minuta, Receta y BuscarDispositivo  
+✅ **Servicios de datos**: Conexión y gestión de datos  
 ✅ **Permisos de internet**: Configurados en AndroidManifest  
 ✅ **Documentación**: Documentación completa del proyecto  
 
@@ -115,11 +137,22 @@ app/src/main/java/com/example/mykotlinappduoc/
 
 ### Dependencias Principales
 ```kotlin
-implementation("androidx.core:core-ktx:1.12.0")
-implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-implementation("androidx.activity:activity-compose:1.8.2")
+// Firebase
+implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+implementation("com.google.firebase:firebase-auth-ktx")
+implementation("com.google.firebase:firebase-firestore-ktx")
+implementation("com.google.firebase:firebase-storage-ktx")
+
+// Compose
 implementation("androidx.compose.ui:ui:1.5.8")
 implementation("androidx.compose.material3:material3:1.1.2")
+implementation("androidx.navigation:navigation-compose:2.7.6")
+
+// ViewModel
+implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+// Coroutines
+implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 ```
 
 ### Permisos Requeridos
@@ -136,7 +169,7 @@ implementation("androidx.compose.material3:material3:1.1.2")
 
 ## 👨‍💻 Desarrollo
 
-Este proyecto fue desarrollado como parte de la actividad sumativa 2 del curso "Desarrollo de Aplicaciones Móviles" de la Universidad Duoc UC, enfocado en la integración de Kotlin en aplicaciones Android con funcionalidades de accesibilidad.
+Este proyecto fue desarrollado como parte de la actividad formativa 5 del curso "Desarrollo de Aplicaciones Móviles" de la Universidad Duoc UC, enfocado en la programación del backend de aplicaciones móviles con Firebase y Kotlin.
 
 ## 📞 Soporte
 
