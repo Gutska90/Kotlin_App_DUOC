@@ -68,6 +68,9 @@ dependencies {
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // Location Services
+    implementation("com.google.android.gms:play-services-location:21.3.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

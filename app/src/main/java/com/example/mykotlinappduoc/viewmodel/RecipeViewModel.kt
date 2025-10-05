@@ -2,9 +2,12 @@ package com.example.mykotlinappduoc.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mykotlinappduoc.data.DayMenu
 import com.example.mykotlinappduoc.data.Recipe
+import com.example.mykotlinappduoc.data.SampleRecipes
 import com.example.mykotlinappduoc.data.User
 import com.example.mykotlinappduoc.data.WeeklyMenu
+import com.example.mykotlinappduoc.services.DataMigrationService
 import com.example.mykotlinappduoc.services.FirebaseService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +21,7 @@ import kotlinx.coroutines.launch
 class RecipeViewModel : ViewModel() {
     
     private val firebaseService = FirebaseService()
+    private val migrationService = DataMigrationService()
     
     // Estados de la aplicación
     private val _currentUser = MutableStateFlow<User?>(null)
@@ -91,60 +95,152 @@ class RecipeViewModel : ViewModel() {
     // ========== GESTIÓN DE RECETAS ==========
     
     /**
-     * Carga todas las recetas públicas
+     * Carga todas las recetas públicas desde Firebase
      */
     fun loadRecipes() {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
             
-            firebaseService.getAllRecipes()
-                .onSuccess { recipes ->
-                    _recipes.value = recipes
-                }
-                .onFailure { exception ->
-                    _errorMessage.value = exception.message
-                }
+            try {
+                // Intentar cargar desde Firebase
+                firebaseService.getAllRecipes()
+                    .onSuccess { recipes ->
+                        if (recipes.isEmpty()) {
+                            // Si no hay recetas, migrar las de ejemplo
+                            migrateSampleRecipes()
+                        } else {
+                            _recipes.value = recipes
+                        }
+                    }
+                    .onFailure { exception ->
+                        // Si falla Firebase, usar recetas de ejemplo como fallback
+                        _recipes.value = SampleRecipes.todasLasRecetas
+                        _errorMessage.value = "Error de conexión: ${exception.message}"
+                    }
+            } catch (e: Exception) {
+                // Fallback a recetas de ejemplo
+                _recipes.value = SampleRecipes.todasLasRecetas
+                _errorMessage.value = "Error inesperado: ${e.message}"
+            }
             
             _isLoading.value = false
         }
     }
     
     /**
-     * Carga recetas por categoría
+     * Migra las recetas de ejemplo a Firebase
+     */
+    private fun migrateSampleRecipes() {
+        viewModelScope.launch {
+            migrationService.migrateSampleRecipes()
+                .onSuccess { migrated ->
+                    if (migrated) {
+                        // Recargar recetas después de la migración
+                        firebaseService.getAllRecipes()
+                            .onSuccess { recipes -> _recipes.value = recipes }
+                    } else {
+                        // Ya existen recetas, cargarlas
+                        firebaseService.getAllRecipes()
+                            .onSuccess { recipes -> _recipes.value = recipes }
+                    }
+                }
+                .onFailure { exception ->
+                    // Si falla la migración, usar recetas locales
+                    _recipes.value = SampleRecipes.todasLasRecetas
+                    _errorMessage.value = "Error migrando datos: ${exception.message}"
+                }
+        }
+    }
+    
+    /**
+     * Carga recetas por categoría desde Firebase
      */
     fun loadRecipesByCategory(category: String) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
             
-            firebaseService.getRecipesByCategory(category)
-                .onSuccess { recipes ->
-                    _recipes.value = recipes
+            try {
+                firebaseService.getRecipesByCategory(category)
+                    .onSuccess { recipes ->
+                        _recipes.value = recipes
+                    }
+                    .onFailure { exception ->
+                        // Fallback a recetas locales por categoría
+                        val filteredRecipes = when (category) {
+                            "Desayuno" -> SampleRecipes.desayunos
+                            "Almuerzo" -> SampleRecipes.almuerzos
+                            "Cena" -> SampleRecipes.cenas
+                            "Snack" -> SampleRecipes.snacks
+                            else -> SampleRecipes.todasLasRecetas
+                        }
+                        _recipes.value = filteredRecipes
+                        _errorMessage.value = "Error de conexión: ${exception.message}"
+                    }
+            } catch (e: Exception) {
+                // Fallback a recetas locales
+                val filteredRecipes = when (category) {
+                    "Desayuno" -> SampleRecipes.desayunos
+                    "Almuerzo" -> SampleRecipes.almuerzos
+                    "Cena" -> SampleRecipes.cenas
+                    "Snack" -> SampleRecipes.snacks
+                    else -> SampleRecipes.todasLasRecetas
                 }
-                .onFailure { exception ->
-                    _errorMessage.value = exception.message
-                }
+                _recipes.value = filteredRecipes
+                _errorMessage.value = "Error inesperado: ${e.message}"
+            }
             
             _isLoading.value = false
         }
     }
     
     /**
-     * Busca recetas
+     * Busca recetas con debounce para optimizar rendimiento
      */
     fun searchRecipes(query: String) {
         viewModelScope.launch {
+            // Debounce: esperar 300ms antes de buscar
+            kotlinx.coroutines.delay(300)
+            
             _isLoading.value = true
             _errorMessage.value = null
             
-            firebaseService.searchRecipes(query)
-                .onSuccess { recipes ->
-                    _recipes.value = recipes
+            try {
+                if (query.isBlank()) {
+                    // Si no hay query, cargar todas las recetas
+                    loadRecipes()
+                } else {
+                    // Buscar en Firebase
+                    firebaseService.searchRecipes(query)
+                        .onSuccess { recipes ->
+                            _recipes.value = recipes
+                        }
+                        .onFailure { exception ->
+                            // Fallback a búsqueda local
+                            val searchResults = SampleRecipes.todasLasRecetas.filter { recipe ->
+                                recipe.name.contains(query, ignoreCase = true) ||
+                                recipe.description.contains(query, ignoreCase = true) ||
+                                recipe.ingredients.any { it.contains(query, ignoreCase = true) }
+                            }
+                            _recipes.value = searchResults
+                            _errorMessage.value = "Error de conexión: ${exception.message}"
+                        }
                 }
-                .onFailure { exception ->
-                    _errorMessage.value = exception.message
+            } catch (e: Exception) {
+                // Fallback a búsqueda local
+                val searchResults = if (query.isBlank()) {
+                    SampleRecipes.todasLasRecetas
+                } else {
+                    SampleRecipes.todasLasRecetas.filter { recipe ->
+                        recipe.name.contains(query, ignoreCase = true) ||
+                        recipe.description.contains(query, ignoreCase = true) ||
+                        recipe.ingredients.any { it.contains(query, ignoreCase = true) }
+                    }
                 }
+                _recipes.value = searchResults
+                _errorMessage.value = "Error inesperado: ${e.message}"
+            }
             
             _isLoading.value = false
         }
@@ -212,6 +308,50 @@ class RecipeViewModel : ViewModel() {
             
             _isLoading.value = false
         }
+    }
+    
+    /**
+     * Agrega una receta a una comida específica de un día
+     */
+    fun addRecipeToMeal(day: String, mealType: String, recipe: Recipe) {
+        val currentMenu = _weeklyMenu.value
+        if (currentMenu == null) {
+            // Crear nueva minuta si no existe
+            val newWeeklyMenu = WeeklyMenu(
+                id = "",
+                userId = _currentUser.value?.id ?: "",
+                weekStartDate = java.util.Date(),
+                days = mutableMapOf()
+            )
+            _weeklyMenu.value = newWeeklyMenu
+            addRecipeToMeal(day, mealType, recipe)
+            return
+        }
+        
+        val dayMenu = currentMenu.days[day] ?: DayMenu(
+            date = java.util.Date(),
+            breakfast = null,
+            lunch = null,
+            dinner = null,
+            snack = null
+        )
+        
+        val updatedDayMenu = when (mealType) {
+            "Desayuno" -> dayMenu.copy(breakfast = recipe)
+            "Almuerzo" -> dayMenu.copy(lunch = recipe)
+            "Cena" -> dayMenu.copy(dinner = recipe)
+            "Snack" -> dayMenu.copy(snack = recipe)
+            else -> dayMenu
+        }
+        
+        val updatedDays = currentMenu.days.toMutableMap()
+        updatedDays[day] = updatedDayMenu
+        
+        val updatedWeeklyMenu = currentMenu.copy(days = updatedDays)
+        _weeklyMenu.value = updatedWeeklyMenu
+        
+        // TODO: Persistir en Firebase
+        // updateWeeklyMenu(updatedWeeklyMenu)
     }
     
     /**

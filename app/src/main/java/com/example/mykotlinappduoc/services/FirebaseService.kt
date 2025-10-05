@@ -13,7 +13,7 @@ import java.util.Date
  * Servicio para manejar todas las operaciones con Firebase
  * Incluye autenticación, CRUD de usuarios, recetas y minutas
  */
-class FirebaseService {
+class FirebaseService : AppRepository {
     
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
@@ -28,7 +28,7 @@ class FirebaseService {
     /**
      * Registra un nuevo usuario con email y contraseña
      */
-    suspend fun registerUser(email: String, password: String, name: String): Result<User> {
+    override suspend fun registerUser(email: String, password: String, name: String): Result<User> {
         return try {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val user = User(
@@ -50,7 +50,7 @@ class FirebaseService {
     /**
      * Inicia sesión con email y contraseña
      */
-    suspend fun signIn(email: String, password: String): Result<User> {
+    override suspend fun signIn(email: String, password: String): Result<User> {
         return try {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
             val userId = authResult.user?.uid ?: throw Exception("Error al obtener ID de usuario")
@@ -71,7 +71,7 @@ class FirebaseService {
     /**
      * Cierra la sesión del usuario actual
      */
-    fun signOut() {
+    override fun signOut() {
         auth.signOut()
     }
     
@@ -137,7 +137,7 @@ class FirebaseService {
     /**
      * Crea una nueva receta
      */
-    suspend fun createRecipe(recipe: Recipe): Result<Recipe> {
+    override suspend fun createRecipe(recipe: Recipe): Result<Recipe> {
         return try {
             val docRef = recipesCollection.add(recipe).await()
             val newRecipe = recipe.copy(id = docRef.id)
@@ -151,7 +151,7 @@ class FirebaseService {
     /**
      * Obtiene todas las recetas públicas
      */
-    suspend fun getAllRecipes(): Result<List<Recipe>> {
+    override suspend fun getAllRecipes(): Result<List<Recipe>> {
         return try {
             val querySnapshot = recipesCollection
                 .whereEqualTo("isPublic", true)
@@ -230,7 +230,7 @@ class FirebaseService {
     /**
      * Crea una nueva minuta semanal
      */
-    suspend fun createWeeklyMenu(weeklyMenu: WeeklyMenu): Result<WeeklyMenu> {
+    override suspend fun createWeeklyMenu(weeklyMenu: WeeklyMenu): Result<WeeklyMenu> {
         return try {
             val docRef = weeklyMenusCollection.add(weeklyMenu).await()
             val newWeeklyMenu = weeklyMenu.copy(id = docRef.id)
@@ -244,7 +244,7 @@ class FirebaseService {
     /**
      * Obtiene la minuta semanal de un usuario
      */
-    suspend fun getWeeklyMenuByUser(userId: String): Result<WeeklyMenu?> {
+    override suspend fun getWeeklyMenuByUser(userId: String): Result<WeeklyMenu?> {
         return try {
             val querySnapshot = weeklyMenusCollection
                 .whereEqualTo("userId", userId)

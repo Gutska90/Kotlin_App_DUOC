@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "123456789012",
+    "project_number": "55139306275",
     "project_id": "minuta-nutricional-duoc",
-    "storage_bucket": "minuta-nutricional-duoc.appspot.com"
+    "storage_bucket": "minuta-nutricional-duoc.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789012:android:abcdef1234567890",
+        "mobilesdk_app_id": "1:55139306275:android:8fd8c8e7cc87b472115a96",
         "android_client_info": {
           "package_name": "com.example.mykotlinappduoc"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDummyKeyForDevelopment123456789"
+          "current_key": "AIzaSyBedcmmS6OBMEJVrh5R5GZ46HRANDIeMc4"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

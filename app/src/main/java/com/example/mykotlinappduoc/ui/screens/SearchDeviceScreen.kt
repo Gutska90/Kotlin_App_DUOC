@@ -2,23 +2,31 @@ package com.example.mykotlinappduoc.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeviceHub
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material.icons.filled.WifiOff
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mykotlinappduoc.data.Recipe
+import android.Manifest
+import android.annotation.SuppressLint
+import android.location.Location
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
 
 /**
  * Pantalla de Búsqueda de Dispositivos
@@ -36,10 +44,17 @@ fun SearchDeviceScreen(
     var isConnected by remember { mutableStateOf(false) }
     var connectedDevice by remember { mutableStateOf<String?>(null) }
     
+    val context = LocalContext.current
+    val fusedClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    var lastKnownLocation by remember { mutableStateOf<Location?>(null) }
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val isTablet = screenWidth >= 600.dp
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(if (isTablet) 24.dp else 16.dp)
     ) {
         // Header
         Row(
@@ -62,12 +77,7 @@ fun SearchDeviceScreen(
                 )
             }
             
-            Icon(
-                imageVector = Icons.Default.DeviceHub,
-                contentDescription = "Dispositivos",
-                modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
+            Icon(imageVector = Icons.Default.Info, contentDescription = "Info", modifier = Modifier.size(32.dp), tint = MaterialTheme.colorScheme.primary)
         }
         
         // Estado de conexión
@@ -78,10 +88,14 @@ fun SearchDeviceScreen(
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        // Botón de búsqueda
+        // Botón de búsqueda (con geolocalización básica)
         Button(
             onClick = {
                 isSearching = true
+                // Intentar obtener última ubicación conocida
+                requestLastLocation(fusedClient) { location ->
+                    lastKnownLocation = location
+                }
                 // Simular búsqueda de dispositivos
                 foundDevices = listOf(
                     DeviceInfo("Cocina Smart", "192.168.1.100", "Activo"),
@@ -141,8 +155,29 @@ fun SearchDeviceScreen(
         
         // Información de ayuda
         HelpCard()
+
+        if (lastKnownLocation != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Ubicación aproximada: ${lastKnownLocation!!.latitude.format(4)}, ${lastKnownLocation!!.longitude.format(4)}",
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }
+
+@SuppressLint("MissingPermission")
+private fun requestLastLocation(
+    fusedClient: FusedLocationProviderClient,
+    onLocation: (Location?) -> Unit
+) {
+    fusedClient.lastLocation
+        .addOnSuccessListener { location -> onLocation(location) }
+        .addOnFailureListener { onLocation(null) }
+}
+
+private fun Double.format(decimals: Int): String =
+    String.format(java.util.Locale.getDefault(), "% .${'$'}{decimals}f", this).trim()
 
 @Composable
 fun ConnectionStatusCard(
@@ -165,15 +200,7 @@ fun ConnectionStatusCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = if (isConnected) Icons.Default.Wifi else Icons.Default.WifiOff,
-                contentDescription = "Estado de conexión",
-                tint = if (isConnected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
-            )
+            Icon(imageVector = Icons.Default.Info, contentDescription = "Estado de conexión")
             
             Spacer(modifier = Modifier.width(12.dp))
             
@@ -254,12 +281,7 @@ fun EmptyDevicesState() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.DeviceHub,
-            contentDescription = "Sin dispositivos",
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
+        Icon(imageVector = Icons.Default.Info, contentDescription = "Sin dispositivos", modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary)
         
         Spacer(modifier = Modifier.height(16.dp))
         

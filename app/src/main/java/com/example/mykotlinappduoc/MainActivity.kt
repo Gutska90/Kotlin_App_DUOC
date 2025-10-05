@@ -4,15 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mykotlinappduoc.ui.screens.*
+import com.example.mykotlinappduoc.data.Recipe
 import com.example.mykotlinappduoc.ui.theme.MyKotlinAppDuocTheme
 import com.example.mykotlinappduoc.viewmodel.RecipeViewModel
 
@@ -45,6 +48,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val viewModel: RecipeViewModel = viewModel()
     var currentScreen by remember { mutableStateOf("login") }
     var selectedTab by remember { mutableStateOf(0) }
+    var showWrite by remember { mutableStateOf(false) }
+    var showSpeak by remember { mutableStateOf(false) }
+    var showRecipeSelection by remember { mutableStateOf(false) }
+    var selectedDay by remember { mutableStateOf("") }
+    var selectedMealType by remember { mutableStateOf("") }
+    var showRecipeDetail by remember { mutableStateOf(false) }
+    var selectedRecipe by remember { mutableStateOf<Recipe?>(null) }
     
     val currentUser by viewModel.currentUser.collectAsState()
     val recipes by viewModel.recipes.collectAsState()
@@ -52,14 +62,18 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
-    // Observar cambios en el usuario autenticado
-    LaunchedEffect(currentUser) {
-        if (currentUser != null) {
-            currentScreen = "main"
-        } else {
-            currentScreen = "login"
-        }
-    }
+            // Observar cambios en el usuario autenticado
+            LaunchedEffect(currentUser) {
+                if (currentUser != null) {
+                    currentScreen = "main"
+                    // Cargar recetas solo si no están cargadas
+                    if (recipes.isEmpty()) {
+                        viewModel.loadRecipes()
+                    }
+                } else {
+                    currentScreen = "login"
+                }
+            }
 
     when (currentScreen) {
         "login" -> {
@@ -99,19 +113,19 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 bottomBar = {
                     NavigationBar {
                         NavigationBarItem(
-                            icon = { Icon(Icons.Default.Restaurant, contentDescription = "Recetas") },
+                            icon = { Icon(Icons.Default.Star, contentDescription = "Recetas") },
                             label = { Text("Recetas") },
                             selected = selectedTab == 0,
                             onClick = { selectedTab = 0 }
                         )
                         NavigationBarItem(
-                            icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Minuta") },
+                            icon = { Icon(Icons.Default.DateRange, contentDescription = "Minuta") },
                             label = { Text("Minuta") },
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 }
                         )
                         NavigationBarItem(
-                            icon = { Icon(Icons.Default.DeviceHub, contentDescription = "Dispositivos") },
+                            icon = { Icon(Icons.Default.Phone, contentDescription = "Dispositivos") },
                             label = { Text("Dispositivos") },
                             selected = selectedTab == 2,
                             onClick = { selectedTab = 2 }
@@ -119,23 +133,31 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     }
                 }
             ) { innerPadding ->
-                Column(modifier = Modifier.padding(innerPadding)) {
+                Box(modifier = Modifier.padding(innerPadding)) {
                     when (selectedTab) {
                         0 -> {
                             RecipeScreen(
                                 recipes = recipes,
-                                onRecipeClick = { /* TODO: Navegar a detalle de receta */ },
+                                onRecipeClick = { recipe ->
+                                    selectedRecipe = recipe
+                                    showRecipeDetail = true
+                                },
                                 onCreateRecipe = { /* TODO: Navegar a crear receta */ },
                                 onSearch = { query -> viewModel.searchRecipes(query) }
                             )
                         }
-                        1 -> {
-                            WeeklyMenuScreen(
-                                weeklyMenu = weeklyMenu,
-                                onEditMenu = { /* TODO: Navegar a editar minuta */ },
-                                onCreateMenu = { /* TODO: Navegar a crear minuta */ }
-                            )
-                        }
+                                1 -> {
+                                    WeeklyMenuScreen(
+                                        weeklyMenu = weeklyMenu,
+                                        onEditMenu = { /* TODO: Navegar a editar minuta */ },
+                                        onCreateMenu = { /* TODO: Navegar a crear minuta */ },
+                                        onAddRecipe = { day, mealType ->
+                                            selectedDay = day
+                                            selectedMealType = mealType
+                                            showRecipeSelection = true
+                                        }
+                                    )
+                                }
                         2 -> {
                             SearchDeviceScreen(
                                 onSearchDevices = { /* TODO: Implementar búsqueda de dispositivos */ },
@@ -148,11 +170,79 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
     }
     
+    // Modales simples para Escribir/Hablar
+    if (showWrite) {
+        AlertDialog(
+            onDismissRequest = { showWrite = false },
+            confirmButton = {},
+            title = { Text("Escribir") },
+            text = {
+                WriteScreen(onSave = { /* podría persistir */ showWrite = false })
+            }
+        )
+    }
+    if (showSpeak) {
+        AlertDialog(
+            onDismissRequest = { showSpeak = false },
+            confirmButton = {},
+            title = { Text("Hablar") },
+            text = {
+                SpeakScreen(onResult = { /* usar texto */ showSpeak = false })
+            }
+        )
+    }
+
+    if (showRecipeSelection) {
+        AlertDialog(
+            onDismissRequest = { showRecipeSelection = false },
+            confirmButton = {},
+            title = { Text("Seleccionar Receta") },
+            text = {
+                RecipeSelectionScreen(
+                    recipes = recipes,
+                    selectedMealType = selectedMealType,
+                    selectedDay = selectedDay,
+                    onRecipeSelected = { recipe ->
+                        viewModel.addRecipeToMeal(selectedDay, selectedMealType, recipe)
+                        showRecipeSelection = false
+                    },
+                    onBack = { showRecipeSelection = false },
+                    onSearch = { query -> viewModel.searchRecipes(query) }
+                )
+            }
+        )
+    }
+
+    if (showRecipeDetail && selectedRecipe != null) {
+        AlertDialog(
+            onDismissRequest = { 
+                showRecipeDetail = false
+                selectedRecipe = null
+            },
+            confirmButton = {},
+            title = { Text("Detalle de Receta") },
+            text = {
+                RecipeDetailScreen(
+                    recipe = selectedRecipe!!,
+                    onBack = { 
+                        showRecipeDetail = false
+                        selectedRecipe = null
+                    },
+                    onAddToMenu = { recipe ->
+                        // TODO: Implementar agregar a menú desde detalle
+                        showRecipeDetail = false
+                        selectedRecipe = null
+                    }
+                )
+            }
+        )
+    }
+
     // Mostrar loading y errores
     if (isLoading) {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = androidx.compose.ui.Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
         }

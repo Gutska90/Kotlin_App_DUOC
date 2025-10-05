@@ -20,7 +20,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mykotlinappduoc.data.User
-import com.example.mykotlinappduoc.data.UserManager
 
 /**
  * Pantalla de Registro con componentes Material Design adaptados para accesibilidad

@@ -2,16 +2,18 @@ package com.example.mykotlinappduoc.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,12 +33,17 @@ import java.util.*
 fun WeeklyMenuScreen(
     weeklyMenu: WeeklyMenu?,
     onEditMenu: () -> Unit,
-    onCreateMenu: () -> Unit
+    onCreateMenu: () -> Unit,
+    onAddRecipe: (String, String) -> Unit = { _, _ -> } // day, mealType
 ) {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val isTablet = screenWidth >= 600.dp
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(if (isTablet) 24.dp else 16.dp)
     ) {
         // Header
         Row(
@@ -69,7 +76,11 @@ fun WeeklyMenuScreen(
         
         if (weeklyMenu != null) {
             // Mostrar minuta existente
-            WeeklyMenuContent(weeklyMenu = weeklyMenu)
+            WeeklyMenuContent(
+                weeklyMenu = weeklyMenu, 
+                isTablet = isTablet,
+                onAddRecipe = onAddRecipe
+            )
         } else {
             // Mostrar estado vacío
             EmptyWeeklyMenuState(onCreateMenu = onCreateMenu)
@@ -78,7 +89,11 @@ fun WeeklyMenuScreen(
 }
 
 @Composable
-fun WeeklyMenuContent(weeklyMenu: WeeklyMenu) {
+fun WeeklyMenuContent(
+    weeklyMenu: WeeklyMenu, 
+    isTablet: Boolean = false,
+    onAddRecipe: (String, String) -> Unit = { _, _ -> }
+) {
     val daysOfWeek = listOf(
         "Lunes" to "Lun",
         "Martes" to "Mar", 
@@ -89,16 +104,53 @@ fun WeeklyMenuContent(weeklyMenu: WeeklyMenu) {
         "Domingo" to "Dom"
     )
     
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(daysOfWeek) { (dayName, dayShort) ->
-            val dayMenu = weeklyMenu.days[dayName]
-            DayMenuCard(
-                dayName = dayName,
-                dayShort = dayShort,
-                dayMenu = dayMenu
-            )
+    if (isTablet) {
+        // Layout de grid para tablets
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(
+                items = daysOfWeek.chunked(2),
+                key = { rowDays -> rowDays.joinToString { it.first } }
+            ) { rowDays ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    rowDays.forEach { (dayName, dayShort) ->
+                        val dayMenu = weeklyMenu.days[dayName]
+                        DayMenuCard(
+                            dayName = dayName,
+                            dayShort = dayShort,
+                            dayMenu = dayMenu,
+                            modifier = Modifier.weight(1f),
+                            onAddRecipe = onAddRecipe
+                        )
+                    }
+                    // Espacio vacío si hay número impar de días
+                    if (rowDays.size == 1) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+    } else {
+        // Layout de lista para móviles
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(
+                items = daysOfWeek,
+                key = { (dayName, _) -> dayName }
+            ) { (dayName, dayShort) ->
+                val dayMenu = weeklyMenu.days[dayName]
+                DayMenuCard(
+                    dayName = dayName,
+                    dayShort = dayShort,
+                    dayMenu = dayMenu,
+                    onAddRecipe = onAddRecipe
+                )
+            }
         }
     }
 }
@@ -107,10 +159,12 @@ fun WeeklyMenuContent(weeklyMenu: WeeklyMenu) {
 fun DayMenuCard(
     dayName: String,
     dayShort: String,
-    dayMenu: DayMenu?
+    dayMenu: DayMenu?,
+    modifier: Modifier = Modifier,
+    onAddRecipe: (String, String) -> Unit = { _, _ -> }
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -137,34 +191,19 @@ fun DayMenuCard(
             Spacer(modifier = Modifier.height(12.dp))
             
             // Comidas del día
-            if (dayMenu != null) {
+            val meals = listOf(
+                "Desayuno" to (dayMenu?.breakfast),
+                "Almuerzo" to (dayMenu?.lunch),
+                "Cena" to (dayMenu?.dinner),
+                "Snack" to (dayMenu?.snack)
+            )
+            
+            meals.forEach { (mealName, recipe) ->
                 MealItem(
-                    title = "Desayuno",
-                    recipe = dayMenu.breakfast,
-                    icon = Icons.Default.Restaurant
-                )
-                MealItem(
-                    title = "Almuerzo", 
-                    recipe = dayMenu.lunch,
-                    icon = Icons.Default.Restaurant
-                )
-                MealItem(
-                    title = "Cena",
-                    recipe = dayMenu.dinner,
-                    icon = Icons.Default.Restaurant
-                )
-                MealItem(
-                    title = "Snack",
-                    recipe = dayMenu.snack,
-                    icon = Icons.Default.Restaurant
-                )
-            } else {
-                Text(
-                    text = "No hay comidas planificadas",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    title = mealName,
+                    recipe = recipe,
+                    icon = Icons.Default.Info,
+                    onAddRecipe = { onAddRecipe(dayName, mealName) }
                 )
             }
         }
@@ -175,7 +214,8 @@ fun DayMenuCard(
 fun MealItem(
     title: String,
     recipe: Recipe?,
-    icon: androidx.compose.ui.graphics.vector.ImageVector
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onAddRecipe: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -199,15 +239,32 @@ fun MealItem(
             modifier = Modifier.weight(1f)
         )
         
-        Text(
-            text = recipe?.name ?: "Sin receta",
-            fontSize = 14.sp,
-            color = if (recipe != null) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
+        if (recipe != null) {
+            Text(
+                text = recipe.name,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            TextButton(
+                onClick = onAddRecipe,
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = "Agregar receta",
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Agregar",
+                    fontSize = 12.sp
+                )
             }
-        )
+        }
     }
 }
 
@@ -221,7 +278,7 @@ fun EmptyWeeklyMenuState(onCreateMenu: () -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Default.CalendarToday,
+            imageVector = Icons.Default.DateRange,
             contentDescription = "Minuta vacía",
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.primary

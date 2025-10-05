@@ -14,7 +14,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mykotlinappduoc.data.UserManager
 
 /**
  * Pantalla de Recuperar Contraseña con componentes Material Design adaptados para accesibilidad
@@ -129,14 +128,9 @@ fun ForgotPasswordScreen(
                     else -> {
                         isLoading = true
                         // Simular verificación de email
-                        val user = UserManager.findUserByEmail(email)
-                        if (user != null) {
-                            successMessage = "Se ha enviado un enlace de recuperación a ${user.email}. " +
-                                    "Por favor revise su bandeja de entrada y siga las instrucciones."
-                            errorMessage = ""
-                        } else {
-                            errorMessage = "No se encontró una cuenta asociada a este email"
-                        }
+                        successMessage = "Se ha enviado un enlace de recuperación a $email. " +
+                                "Por favor revise su bandeja de entrada y siga las instrucciones."
+                        errorMessage = ""
                         isLoading = false
                     }
                 }

@@ -2,6 +2,7 @@ package com.example.mykotlinappduoc.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -9,11 +10,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Time
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -37,11 +39,15 @@ fun RecipeScreen(
     var selectedCategory by remember { mutableStateOf("Todas") }
     
     val categories = listOf("Todas", "Desayuno", "Almuerzo", "Cena", "Snack")
+    val configuration = LocalConfiguration.current
+    val isTablet = remember(configuration) {
+        configuration.screenWidthDp >= 600
+    }
     
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(if (isTablet) 24.dp else 16.dp)
     ) {
         // Header
         Row(
@@ -90,7 +96,7 @@ fun RecipeScreen(
         )
         
         // Filtros por categoría
-        LazyRow(
+        androidx.compose.foundation.lazy.LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(bottom = 16.dp)
         ) {
@@ -103,18 +109,56 @@ fun RecipeScreen(
             }
         }
         
-        // Lista de recetas
-        if (recipes.isNotEmpty()) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(recipes.filter { 
-                    selectedCategory == "Todas" || it.category == selectedCategory 
-                }) { recipe ->
-                    RecipeCard(
-                        recipe = recipe,
-                        onClick = { onRecipeClick(recipe) }
-                    )
+        // Lista de recetas con memoización
+        val filteredRecipes = remember(recipes, selectedCategory) {
+            recipes.filter { 
+                selectedCategory == "Todas" || it.category == selectedCategory 
+            }
+        }
+        
+        if (filteredRecipes.isNotEmpty()) {
+            
+            if (isTablet) {
+                // Layout de grid para tablets
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(
+                        items = filteredRecipes.chunked(2),
+                        key = { rowRecipes -> rowRecipes.joinToString { it.id } }
+                    ) { rowRecipes ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            rowRecipes.forEach { recipe ->
+                                RecipeCard(
+                                    recipe = recipe,
+                                    onClick = { onRecipeClick(recipe) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            // Espacio vacío si hay número impar de recetas
+                            if (rowRecipes.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Layout de lista para móviles
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(
+                        items = filteredRecipes,
+                        key = { recipe -> recipe.id }
+                    ) { recipe ->
+                        RecipeCard(
+                            recipe = recipe,
+                            onClick = { onRecipeClick(recipe) }
+                        )
+                    }
                 }
             }
         } else {
@@ -126,10 +170,11 @@ fun RecipeScreen(
 @Composable
 fun RecipeCard(
     recipe: Recipe,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         onClick = onClick
     ) {
@@ -181,7 +226,7 @@ fun RecipeCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 RecipeInfoItem(
-                    icon = Icons.Default.Time,
+                    icon = Icons.Default.Info,
                     text = "${recipe.prepTime + recipe.cookTime} min"
                 )
                 RecipeInfoItem(

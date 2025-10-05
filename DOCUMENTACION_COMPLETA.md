@@ -2,6 +2,49 @@
 
 ---
 
+## DESCRIPCIÓN DE LA ACTIVIDAD (Sumativa 3)
+
+En esta octava semana, se realizará la actividad sumativa 3, llamada "Preparación de una aplicación móvil Android/Kotlin para su distribución". Se debe integrar en la app creada con Android Studio y Kotlin tanto el front end como el back end y preparar la aplicación móvil para su publicación en una distribución de descarga de apps. La entrega consiste en la documentación del desarrollo y el código del proyecto comprimido en formato .zip.
+
+### Instrucciones específicas
+- Integrar en la aplicación móvil de accesibilidad para personas con discapacidad sensorial visual (desarrollada en la experiencia de aprendizaje 1) el front end y back end en Kotlin, y preparar y publicar el APK firmado.
+- La aplicación debe estar diseñada con componentes UI específicos para personas con discapacidad sensorial visual, facilitando su comunicación (escribir y leer) en el entorno cotidiano, transformando sus dispositivos móviles en una herramienta que los integra al mundo real y digital.
+
+### Requerimientos generales
+- Integrar el front end (views: Login, Registro, Recuperar contraseña, HomeMenú, Escribir, Hablar y BuscarDispositivo; uso de geolocalización, fragments, viewgroups, content providers, widgets, palette texts, buttons y palette widgets) y el back end (base de datos Google Firebase para permanencia de datos, reglas de conexión con los objetos y configuración de parámetros para autenticación de usuarios registrados) en Kotlin sobre la app móvil de las experiencias 1 y 2.
+- Implementar servicios para manejo de datos: conexión a la base de datos, autorización y autenticación de usuarios, operaciones CRUD para gestión de usuarios y para las funciones de las views Escribir, Hablar y BuscarDispositivo.
+- Testear con pruebas unitarias y de UI (JUnit, Mockito, Robolectric, Espresso, TDD y Firebase Test Lab) la app móvil, para luego generar el APK, firmarlo y publicarlo en una plataforma de descarga gratuita, simulando la tienda Google Play Store.
+
+### Requerimientos técnicos
+- Desarrollar la aplicación con Android Studio.
+- Compartir el repositorio Git del proyecto.
+- Integrar el lenguaje Kotlin al código fuente de la app.
+- Integrar los componentes UI de Android Studio y Kotlin.
+- Integrar Firebase para persistencia de datos y autorización.
+- Desarrollar pruebas unitarias y de UI en Kotlin.
+- Generar el APK, firmarlo y publicarlo.
+
+### Entrega de encargo con documentación
+Actividad con dos partes, a entregar todo en un único archivo ZIP:
+1) Comprimir la carpeta del código del proyecto completo desde Git y adjuntar el APK generado, firmado y publicado (o enlace de distribución) en el espacio indicado del AVA.
+2) Documentar todo el proceso de desarrollo: rendimiento de las views y de las pruebas, restricciones, y seguimiento de 5 riesgos técnicos definidos en la experiencia de aprendizaje 1, describiendo resultados de las acciones de mitigación. Este mismo documento debe adjuntarse en formato PDF dentro del ZIP junto con el proyecto.
+- Entregar el producto totalmente finalizado, según el avance solicitado.
+- No se aceptarán entregas fuera de plazo ni por otro medio que no sea AVA.
+- Todos los productos desarrollados con IA serán evaluados con nota mínima.
+
+### Restricciones en esta entrega
+La aplicación móvil debe ser adaptativa a múltiples dispositivos Android con conexión activa a internet.
+
+### Formato del texto
+- Fuente: Arial
+- Tamaño: 12 pt
+- Interlineado: 1,5 líneas
+- Alineación: izquierda
+
+---
+
+---
+
 ## DATOS DEL DOCUMENTO
 
 ### Histórico de Revisiones
@@ -37,7 +80,7 @@ Las personas con discapacidad sensorial visual enfrentan barreras significativas
 Desarrollar una aplicación móvil nativa en Android usando Kotlin y Jetpack Compose, específicamente diseñada para personas con discapacidad sensorial visual. La aplicación incluye funcionalidades de lectura de texto en voz alta, escritura asistida con corrección automática, y una interfaz completamente accesible con componentes Material Design adaptados para facilitar la comunicación y mejorar la integración digital.
 
 ### Contexto del Proyecto
-Esta aplicación forma parte de la actividad sumativa 2 del curso de Desarrollo de Aplicaciones Móviles, donde se integran las funcionalidades básicas y avanzadas del lenguaje de programación Kotlin en una aplicación Android Studio existente. El proyecto busca demostrar el dominio de tecnologías móviles modernas aplicadas a la inclusión social.
+Esta aplicación forma parte de la actividad sumativa 3 del curso de Desarrollo de Aplicaciones Móviles, enfocada en integrar front end y back end en Kotlin, preparar el APK firmado y simular su publicación para distribución. El proyecto busca demostrar el dominio de tecnologías móviles modernas aplicadas a la inclusión social.
 
 ---
 
@@ -319,3 +362,99 @@ Proyecto Aplicación Accesibilidad Visual
 **Fecha de finalización**: Diciembre 2024  
 **Estado del proyecto**: ✅ COMPLETADO  
 **Cumplimiento de requerimientos**: 100%
+
+---
+
+## PLANTILLA DE RESPUESTA PARA COMPLETAR Y ANEXAR EN PDF
+
+> Usa estas secciones como plantilla oficial solicitada. Puedes dejarlas como registro adicional junto a las secciones completas anteriores.
+
+### Datos del documento
+#### Histórico de revisiones
+| Versión | Fecha | Descripción/cambio | Autor |
+|---------|------|--------------------|-------|
+|         |      |                    |       |
+
+### Información del proyecto
+| Campo | Información |
+|-------|-------------|
+| Organización | |
+| Sección | |
+| Proyecto (nombre) | |
+| Fecha de inicio | |
+| Fecha de término | |
+| Patrocinador principal | |
+| Docente | |
+
+### Alcance del proyecto
+#### Problema, solución propuesta y contexto del proyecto
+
+
+
+### Funciones esperadas del software a desarrollar
+Solo mockup
+
+
+
+### Rendimiento esperado del software a desarrollar
+Descripción de cada view
+
+
+
+### Restricciones del proyecto
+
+
+
+### Estructura de desglose de trabajo (EDT)
+Definición de Diagrama y diccionario EDT. Adjuntar diagrama y diccionario.
+
+
+
+### Resumen de riesgos
+Listado de riesgos relacionados al desarrollo de software. Indica: riesgo, fase, probabilidad (alta/media/baja) e impacto (alto/significativo/moderado/inferior/bajo) y acción de mitigación.
+
+| Riesgo | Fase | Probabilidad | Impacto | Acción de mitigación |
+|--------|------|--------------|---------|----------------------|
+|        |      |              |         |                      |
+|        |      |              |         |                      |
+|        |      |              |         |                      |
+|        |      |              |         |                      |
+|        |      |              |         |                      |
+
+### Definición de artefactos
+Listar y describir los artefactos/entregables del proyecto.
+
+| Artefacto | Descripción |
+|-----------|-------------|
+|           |             |
+|           |             |
+|           |             |
+
+### Condiciones de aceptación para cierre del proyecto
+Condiciones para dar término al proyecto y margen de tolerancia de defectos.
+
+
+
+### Anexos
+- Anexo 1: Diagrama EDT
+- Anexo 2: Diccionario EDT
+
+---
+
+## Guía de compilación, firma y publicación (Release)
+
+1. Generar keystore (solo una vez):
+   - Android Studio > Build > Generate Signed App Bundle / APK > Create new...
+   - Guarda el keystore en `app/keystore/release.jks` y anota alias/contraseña.
+2. Configurar firma en `gradle.properties` (variables locales):
+   - `MYAPP_STORE_FILE=/absolute/path/app/keystore/release.jks`
+   - `MYAPP_STORE_PASSWORD=********`
+   - `MYAPP_KEY_ALIAS=myapp`
+   - `MYAPP_KEY_PASSWORD=********`
+3. Añadir configuración de signing en `build.gradle.kts` (solo si se requiere release real).
+4. Build de APK:
+   - Build > Generate Signed App Bundle / APK > APK > release.
+5. Verificación:
+   - Instalar en dispositivo y validar TTS/STT, login y geolocalización.
+6. Publicación simulada:
+   - Subir APK a una plataforma gratuita (Drive enlazado en AVA) o a un store alternativo para descarga de prueba.

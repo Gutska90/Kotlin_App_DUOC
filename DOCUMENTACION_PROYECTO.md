@@ -1,5 +1,41 @@
 # Documentación del Proyecto - Aplicación de Accesibilidad Visual
 
+---
+
+## Descripción de la actividad (Sumativa 3)
+
+En esta octava semana, se realizará la actividad sumativa 3, llamada "Preparación de una aplicación móvil Android/Kotlin para su distribución". Se debe integrar en la app creada con Android Studio y Kotlin tanto el front end como el back end y preparar la aplicación móvil para su publicación en una distribución de descarga de apps. La entrega consiste en la documentación del desarrollo y el código del proyecto comprimido en formato .zip.
+
+### Instrucciones específicas
+- Integrar en la aplicación de accesibilidad para personas con discapacidad sensorial visual el front end y back end en Kotlin, y preparar y publicar el APK firmado.
+- Diseñar con componentes UI orientados a discapacidad sensorial visual, facilitando comunicación (escribir y leer) e integración al mundo real y digital.
+
+### Requerimientos generales
+- Integrar el front end (views: Login, Registro, Recuperar contraseña, HomeMenú, Escribir, Hablar y BuscarDispositivo; uso de geolocalización, fragments, viewgroups, content providers, widgets, palette texts, buttons y palette widgets) y el back end (Google Firebase para persistencia, reglas de conexión y autenticación de usuarios) en Kotlin.
+- Implementar servicios: conexión a BD, autorización y autenticación, y CRUD para usuarios y funciones de Escribir, Hablar y BuscarDispositivo.
+- Testear con JUnit, Mockito, Robolectric, Espresso, TDD y Firebase Test Lab. Luego generar, firmar y publicar el APK en una plataforma gratuita, simulando Google Play Store.
+
+### Requerimientos técnicos
+- Android Studio; repositorio Git compartido.
+- Kotlin en todo el código y componentes UI de Android/Kotlin.
+- Firebase para persistencia y autorización.
+- Pruebas unitarias/UI en Kotlin.
+- Generación y firma de APK y publicación.
+
+### Entrega de encargo con documentación
+Se entrega en un único ZIP:
+1) Código del proyecto desde Git y APK generado y firmado (o enlace de distribución) subido al AVA.
+2) Documentación del proceso, rendimiento de views, pruebas, restricciones y seguimiento de 5 riesgos técnicos (con resultados de mitigación). Este documento debe adjuntarse en PDF dentro del ZIP.
+- Producto finalizado según lo solicitado.
+- No se aceptan entregas fuera de plazo ni por otro medio que AVA.
+- Productos desarrollados con IA serán evaluados con nota mínima.
+
+### Restricciones de la entrega
+La app debe ser adaptativa a múltiples dispositivos Android con conexión activa a internet.
+
+### Formato del texto
+- Fuente: Arial; Tamaño: 12 pt; Interlineado: 1,5; Alineación: izquierda.
+
 ## Información del Proyecto
 
 **Organización:** Universidad Duoc UC  
@@ -19,7 +55,7 @@ Las personas con discapacidad sensorial visual enfrentan barreras significativas
 Desarrollar una aplicación móvil nativa en Android usando Kotlin y Jetpack Compose, específicamente diseñada para personas con discapacidad sensorial visual. La aplicación incluye funcionalidades de lectura de texto en voz alta, escritura asistida, y una interfaz completamente accesible con componentes Material Design adaptados.
 
 ### Contexto del Proyecto
-Esta aplicación forma parte de la actividad sumativa 2 del curso de Desarrollo de Aplicaciones Móviles, donde se integran las funcionalidades básicas y avanzadas del lenguaje de programación Kotlin en una aplicación Android Studio existente.
+Esta aplicación forma parte de la actividad sumativa 3 del curso de Desarrollo de Aplicaciones Móviles, enfocada en integrar front end y back end, generar el APK firmado y simular su publicación para distribución.
 
 ## Funciones Esperadas del Software
 
@@ -221,3 +257,66 @@ Proyecto Aplicación Accesibilidad Visual
 **Fecha de finalización:** Diciembre 2024  
 **Estado del proyecto:** ✅ COMPLETADO  
 **Cumplimiento de requerimientos:** 100%
+
+---
+
+## Plantilla de respuesta para completar y anexar en PDF
+
+### Datos del documento
+| Versión | Fecha | Descripción/cambio | Autor |
+|---------|------|--------------------|-------|
+|         |      |                    |       |
+
+### Información del proyecto
+| Campo | Información |
+|-------|-------------|
+| Organización | |
+| Sección | |
+| Proyecto (nombre) | |
+| Fecha de inicio | |
+| Fecha de término | |
+| Patrocinador principal | |
+| Docente | |
+
+### Alcance del proyecto
+Problema, solución propuesta y contexto del proyecto.
+
+
+### Funciones esperadas del software a desarrollar
+Solo mockup.
+
+
+### Rendimiento esperado del software a desarrollar
+Descripción de cada view.
+
+
+### Restricciones del proyecto
+
+
+### Estructura de desglose de trabajo (EDT)
+Definición de Diagrama y diccionario EDT. Adjuntar diagrama y diccionario.
+
+
+### Resumen de riesgos
+| Riesgo | Fase | Probabilidad | Impacto | Acción de mitigación |
+|--------|------|--------------|---------|----------------------|
+|        |      |              |         |                      |
+|        |      |              |         |                      |
+|        |      |              |         |                      |
+|        |      |              |         |                      |
+|        |      |              |         |                      |
+
+### Definición de artefactos
+| Artefacto | Descripción |
+|-----------|-------------|
+|           |             |
+|           |             |
+|           |             |
+
+### Condiciones de aceptación para cierre del proyecto
+Condiciones y márgenes de tolerancia de defectos.
+
+
+### Anexos
+- Anexo 1: Diagrama EDT
+- Anexo 2: Diccionario EDT
