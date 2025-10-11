@@ -19,7 +19,8 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WriteScreen(
-    onSave: (String) -> Unit
+    onSave: (String) -> Unit,
+    userId: String = ""
 ) {
     val context = LocalContext.current
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }

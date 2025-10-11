@@ -7,12 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mykotlinappduoc.ui.screens.*
 import com.example.mykotlinappduoc.data.Recipe
@@ -62,16 +66,31 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
+            // Estado del mensaje de bienvenida
+            var showWelcomeMessage by remember { mutableStateOf(false) }
+            var welcomeUserName by remember { mutableStateOf("") }
+
             // Observar cambios en el usuario autenticado
             LaunchedEffect(currentUser) {
                 if (currentUser != null) {
                     currentScreen = "main"
+                    // Mostrar mensaje de bienvenida
+                    welcomeUserName = currentUser?.name ?: ""
+                    showWelcomeMessage = true
                     // Cargar recetas solo si no están cargadas
                     if (recipes.isEmpty()) {
                         viewModel.loadRecipes()
                     }
                 } else {
                     currentScreen = "login"
+                }
+            }
+            
+            // Mensaje de bienvenida
+            if (showWelcomeMessage && currentUser != null) {
+                LaunchedEffect(Unit) {
+                    kotlinx.coroutines.delay(3000) // Mostrar por 3 segundos
+                    showWelcomeMessage = false
                 }
             }
 
@@ -130,6 +149,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             selected = selectedTab == 2,
                             onClick = { selectedTab = 2 }
                         )
+                        NavigationBarItem(
+                            icon = { Icon(Icons.Default.Info, contentDescription = "Ayuda") },
+                            label = { Text("Ayuda") },
+                            selected = selectedTab == 3,
+                            onClick = { selectedTab = 3 }
+                        )
                     }
                 }
             ) { innerPadding ->
@@ -162,6 +187,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             SearchDeviceScreen(
                                 onSearchDevices = { /* TODO: Implementar búsqueda de dispositivos */ },
                                 onConnectDevice = { deviceName -> /* TODO: Implementar conexión */ }
+                            )
+                        }
+                        3 -> {
+                            HelpTutorialScreen(
+                                onBack = { selectedTab = 0 }
                             )
                         }
                     }
@@ -238,6 +268,47 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         )
     }
 
+    // Mostrar mensaje de bienvenida
+    if (showWelcomeMessage && currentUser != null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier.padding(32.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Default.Star,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "¡Bienvenido!",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = welcomeUserName,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+    }
+    
     // Mostrar loading y errores
     if (isLoading) {
         Box(
